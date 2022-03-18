@@ -1,6 +1,5 @@
-from select import select
 import mysql.connector as mysql
-import datetime
+from datetime import date
 
 
 myhost = "localhost"
@@ -41,17 +40,14 @@ class Customer:
         self.phone = self.customer[3]
 
     def __repr__(self):
-        return f'first name: {self.first_name}, last name: {self.last_name}, phone: {self.phone}'
+        return f'First Name: {self.first_name}, Last Name: {self.last_name}, Phone: {self.phone}'
 
     @staticmethod
-    def add(first_name,last_name,phone):
-        sql = 'SELECT * FROM customers WHERE first_name=%s and last_name=%s and phone=%s'
-        val = (first_name,last_name,phone)
-        if cur.execute(sql,val)==None:
-            sql = 'INSERT INTO customers(first_name,last_name,phone) VALUES(%s,%s,%s)'
-            val = (first_name,last_name,phone)
-            cur.execute(sql,val)
-            db.commit()
+    def add(customer_info):
+        sql = 'INSERT INTO customers(first_name,last_name,phone) VALUES(%s,%s,%s)'
+        val = customer_info
+        cur.execute(sql,val)
+        db.commit()
 
     def get(self):
         return self.customer
@@ -67,6 +63,13 @@ class Customer:
         val = (self.id,)
         cur.execute(sql,val)
         db.commit()
+
+    @staticmethod
+    def exist_customer(customer_info):
+        sql = 'SELECT * FROM customers WHERE first_name=%s and last_name=%s and phone=%s'
+        val = customer_info
+        cur.execute(sql,val)
+        return cur.fetchone()
 
 
 class Room:
@@ -100,20 +103,44 @@ class Room:
             cur.execute(sql,val)
             db.commit()
 
+    @staticmethod
+    def get_id(room_no):
+        sql = 'SELECT id FROM rooms WHERE room_no=%s'
+        val = (room_no,)
+        cur.execute(sql,val)
+        return cur.fetchone()[0]
+
     def update(self,customer_id,check_in,check_out):
         sql = 'UPDATE rooms SET customer_id=%s,check_in=%s,check_out=%s WHERE id=%s'
         val = (customer_id,check_in,check_out,self.id)
         cur.execute(sql,val)
         db.commit()
 
-if __name__ == '__main__':
+    @staticmethod
+    def get_rooms(customer_id):
+        sql = 'SELECT id,room_no,check_in,check_out FROM rooms WHERE (customer_id=%s and check_out>%s)'
+        val = (customer_id,date.today())
+        cur.execute(sql,val)
+        return cur.fetchall()
+
+    @staticmethod
+    def get_room_nos(room_type):
+        room_nos = []
+        sql = 'SELECT room_no FROM rooms WHERE (room_type=%s and customer_id IS NULL)'
+        val = (room_type,)
+        cur.execute(sql,val)
+        for room_no in cur.fetchall():
+            room_nos.append(room_no[0])
+        return room_nos
+
+
+def initialize():
     for i in range(1,10):
         Room.add(f'10{i}','single',89)
-        Room.add(f'20{i}','double',12)
-    Customer.add('John','Knight','5022222222')
+        Room.add(f'20{i}','double',120)
+    Customer.add(('John','Knight','5022222222'))
     sql = 'SELECT * FROM customers WHERE first_name=%s and last_name=%s and phone=%s'
     val = ('John','Knight','5022222222')
     cur.execute(sql,val)
     new_customer_id = cur.fetchone()[0]
-    Room(1).update(new_customer_id,'2022-03-02','2022-03-10')
-
+    Room(1).update(new_customer_id,'2023-03-02','2023-03-10')
