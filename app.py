@@ -1,4 +1,3 @@
-from black import cancel
 from models import initialize,cur,Customer,Room
 from get_input import clean_date, get_customer,get_room,get_phone,check_in,check_out,menu,show_menu
 
