@@ -5,6 +5,8 @@ from get_input import clean_date, get_customer,get_room,get_phone,check_in,check
 
 
 room_table = PrettyTable(['ID','Room NO','Cusomtomer id','Room Type','Price','Check in','Check out'])
+
+
 def booking():
     customer = get_customer()
     room = get_room()
