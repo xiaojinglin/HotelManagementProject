@@ -1,7 +1,10 @@
+
+from prettytable import PrettyTable
 from models import initialize,cur,Customer,Room
 from get_input import clean_date, get_customer,get_room,get_phone,check_in,check_out,menu,show_menu
 
 
+room_table = PrettyTable(['ID','Room NO','Cusomtomer id','Room Type','Price','Check in','Check out'])
 def booking():
     customer = get_customer()
     room = get_room()
@@ -12,6 +15,7 @@ def booking():
         Customer.add(customer)
     customer_id = Customer.exist_customer(customer)[0]
     Room(room_id).update(customer_id,date_in,date_out)
+    print('Booking successfully!')
 
 
 def update_customer(customer):
@@ -48,25 +52,37 @@ def update_rooms(rooms,customer_id):
     for room in rooms:
         room = list(room)
         print(f'Room NO: {room[1]}')
-        print(f'Check in: {room[2]}')
+        print(f'Check in: {room[5]}')
         choice = int(show_menu('Edit or Skip')[0])
         if choice == 1:
-            room[2] = check_in()
-        print(f'Check out: {room[3]}')
+            room[5] = check_in()
+        print(f'Check out: {room[6]}')
         choice = int(show_menu('Edit or Skip')[0])
         if choice == 1:
-            room[3] = check_out(room[2])
-        Room(customer_id).update(customer_id,room[2],room[3])
+            room[6] = check_out(room[5])
+        Room(customer_id).update(customer_id,room[5],room[6])
     print('Update successfully')
 
 
-def check_customer(customer_id):
-    customer = Customer(customer_id)
-    rooms = Room.get_rooms(customer_id)  
-    print('******Customer Information******')
-    print(customer)
+def show_customer(customer,rooms): 
+    room_table.clear_rows()
+    total = 0 
+    print(f'Customer id: {customer.id}, First Name: {customer.first_name}, Last Name: {customer.last_name}, Phone: {customer.phone}')   
     for room in rooms:
-        print(f'ID: {room[0]}, Room NO: {room[1]}, Check In: {room[2]}, Check Out: {room[3]}')
+        room_table.add_row(room)
+        days = 1 if room[6]==room[5] else (room[6]-room[5]).days
+        total += room[4]*days
+    print(room_table)
+    print(f'Total amount: ${total}')
+
+
+def check_customer():
+    customer_info = get_customer()
+    has_customer = Customer.exist_customer(customer_info)
+    customer = Customer(has_customer[0])
+    rooms = Room.get_rooms(customer.id)
+    print('******Customer Information******')
+    show_customer(customer,rooms)
     choice = int(show_menu('What do you want to do?')[0])
     if choice == 1:
         update_customer(customer)
@@ -76,18 +92,48 @@ def check_customer(customer_id):
             Room(room[0]).update(None,None,None)
         print('Customer Delete successfully')
     elif choice == 3:
-        update_rooms(rooms,customer_id)
+        update_rooms(rooms,customer.id)
     elif choice == 4:
         cancel_rooms(rooms)
-        
     
 
+def all_customers():
+    customers = Customer.get_all_customers()
+    for customer in customers:
+        c = Customer(customer[0])
+        rooms = Room.get_rooms(customer[0])
+        show_customer(c,rooms)
+
+
+def all_rooms():
+    rooms = Room.get_all_rooms()
+    room_table.clear_rows()
+    for room in rooms:
+        room_table.add_row(room)
+    print(room_table)
+
+
+def app():
+    app_running = True
+    while app_running:
+        print('\n****************HOTEL SYSTEM****************\n')
+        choice = int(show_menu('Choose your next step')[0])
+        if choice == 1:
+            booking()
+        elif choice == 2:
+            check_customer()
+        elif choice == 3:
+            all_customers()
+        elif choice == 4:
+            all_rooms()
+        else:
+            app_running = False
+        input('Press enter to continue')
+        
 
 
 if __name__ == '__main__':
     initialize()
-    booking()
-    check_customer(1)
-
+    app()
     cur.close()
 

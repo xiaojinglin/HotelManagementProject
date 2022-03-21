@@ -71,6 +71,11 @@ class Customer:
         cur.execute(sql,val)
         return cur.fetchone()
 
+    @staticmethod
+    def get_all_customers():
+        cur.execute('SELECT * FROM customers')
+        return cur.fetchall()
+
 
 class Room:
     def __init__(self,id):
@@ -86,12 +91,7 @@ class Room:
         self.check_out = room[6]
 
     def __repr__(self):
-        return f'''room NO: {self.room_no}, 
-                \rcustomer id: {self.customer_id}, 
-                \rroom type: {self.room_type},
-                \rprice: {self.price},
-                \rcheck_in: {self.check_in},
-                \rcheck_out: {self.check_out}'''
+        return f'room NO: {self.room_no},customer id: {self.customer_id},room type: {self.room_type},price: {self.price},check_in: {self.check_in},check_out: {self.check_out}'
 
     @staticmethod
     def add(room_no,room_type,price):
@@ -118,7 +118,7 @@ class Room:
 
     @staticmethod
     def get_rooms(customer_id):
-        sql = 'SELECT id,room_no,check_in,check_out FROM rooms WHERE (customer_id=%s and check_out>%s)'
+        sql = 'SELECT * FROM rooms WHERE (customer_id=%s and check_out>%s)'
         val = (customer_id,date.today())
         cur.execute(sql,val)
         return cur.fetchall()
@@ -133,6 +133,11 @@ class Room:
             room_nos.append(room_no[0])
         return room_nos
 
+    @staticmethod
+    def get_all_rooms():
+        cur.execute('SELECT * from rooms ORDER BY customer_id DESC,room_type')
+        return cur.fetchall()
+
 
 def initialize():
     for i in range(1,10):
@@ -144,3 +149,10 @@ def initialize():
     cur.execute(sql,val)
     new_customer_id = cur.fetchone()[0]
     Room(1).update(new_customer_id,'2023-03-02','2023-03-10')
+    Room(2).update(new_customer_id,'2023-03-02','2023-03-10')
+    Customer.add(('Jake','White','5022222244'))
+    sql = 'SELECT * FROM customers WHERE first_name=%s and last_name=%s and phone=%s'
+    val = ('Jake','White','5022222244')
+    cur.execute(sql,val)
+    new_customer_id = cur.fetchone()[0]
+    Room(9).update(new_customer_id,'2023-05-02','2023-05-10')

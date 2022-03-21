@@ -3,9 +3,12 @@ from models import Room, initialize
 from datetime import date
 from datetime import datetime
 
-menu = {'Choose a room type': ['single','double'],
-        'What do you want to do?': ['Edit customer information','Delete customer','Edit customer booking','Cancel customer booking'],
+menu = {'Choose your next step': ['Booking','Check customer','All customers','All rooms','Exit'],
+        'Choose a room type': ['single','double'],
+        'What do you want to do?': ['Edit customer information','Delete customer',
+                                    'Edit customer booking','Cancel customer booking','Back to the main menu'],
         'Edit or Skip': ['Edit','Skip']}
+
 
 def show_menu(menu_key):
     menu_items = menu[menu_key]
@@ -19,6 +22,7 @@ def show_menu(menu_key):
         else:
             return choice,menu_items[int(choice)-1]
 
+
 def get_phone():
     while True:
         phone = input('Phone NO(eg: 5022222222): ')
@@ -26,6 +30,7 @@ def get_phone():
             print('Invalid phone number, try again')
         else:
             return phone
+
 
 def get_customer():
     first_name = input('First Name:')
