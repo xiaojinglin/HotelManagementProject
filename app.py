@@ -1,7 +1,9 @@
 
 from prettytable import PrettyTable
 from models import initialize,cur,Customer,Room
-from get_input import clean_date, get_customer,get_room,get_phone,check_in,check_out,menu,show_menu
+from get_input import (clean_date, get_customer,get_room,
+                       get_phone,check_in,check_out,menu,
+                       show_menu,search_by,search_get_customer)
 
 
 room_table = PrettyTable(['ID','Room NO','Cusomtomer id','Room Type','Price','Check in','Check out'])
@@ -69,7 +71,7 @@ def update_rooms(rooms,customer_id):
 def show_customer(customer,rooms): 
     room_table.clear_rows()
     total = 0 
-    print(f'Customer id: {customer.id}, First Name: {customer.first_name}, Last Name: {customer.last_name}, Phone: {customer.phone}')   
+    print('\n',customer)
     for room in rooms:
         room_table.add_row(room)
         days = 1 if room[6]==room[5] else (room[6]-room[5]).days
@@ -78,26 +80,42 @@ def show_customer(customer,rooms):
     print(f'Total amount: ${total}')
 
 
+def search_customer():
+    print('Search By:')
+    choice = int(show_menu('Search type')[0])
+    search_dict = {1:'id', 2:'name', 3:'phone'}
+    search_type = search_dict.get(choice)
+    search_value = search_by(search_type)
+    customers = Customer.search_customers(search_type,search_value)
+    return customers
+
+
 def check_customer():
-    customer_info = get_customer()
-    has_customer = Customer.exist_customer(customer_info)
-    customer = Customer(has_customer[0])
-    rooms = Room.get_rooms(customer.id)
-    print('******Customer Information******')
-    show_customer(customer,rooms)
-    choice = int(show_menu('What do you want to do?')[0])
-    if choice == 1:
-        update_customer(customer)
-    elif choice == 2:
-        customer.delete()
-        for room in rooms:
-            Room(room[0]).update(None,None,None)
-        print('Customer Delete successfully')
-    elif choice == 3:
-        update_rooms(rooms,customer.id)
-    elif choice == 4:
-        cancel_rooms(rooms)
-    
+    check_running = True
+    while check_running:
+        customers = search_customer()
+        if not customers:
+            print('The customer you searched is not exist, press enter to try again')
+            continue
+        the_customer_id = search_get_customer(customers)
+        the_customer = Customer(the_customer_id)
+        rooms = Room.get_rooms(the_customer_id)
+        print('******Customer Information******')
+        show_customer(the_customer,rooms)
+        choice = int(show_menu('What do you want to do?')[0])
+        if choice == 1:
+            update_customer(the_customer)
+        elif choice == 2:
+            the_customer.delete()
+            for room in rooms:
+                Room(room[0]).update(None,None,None)
+            print('Customer Delete successfully')
+        elif choice == 3:
+            update_rooms(rooms,the_customer_id)
+        elif choice == 4:
+            cancel_rooms(rooms)
+        check_running = False
+
 
 def all_customers():
     customers = Customer.get_all_customers()
@@ -131,7 +149,6 @@ def app():
         else:
             app_running = False
         input('Press enter to continue')
-        
 
 
 if __name__ == '__main__':

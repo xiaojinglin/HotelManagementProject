@@ -1,10 +1,12 @@
-from models import Room, initialize
+from models import Room, Customer, initialize
 
 from datetime import date
 from datetime import datetime
 
+
 menu = {'Choose your next step': ['Booking','Check customer','All customers','All rooms','Exit'],
         'Choose a room type': ['single','double'],
+        'Search type': ['ID','Name','Phone'],
         'What do you want to do?': ['Edit customer information','Delete customer',
                                     'Edit customer booking','Cancel customer booking','Back to the main menu'],
         'Edit or Skip': ['Edit','Skip']}
@@ -85,3 +87,22 @@ def check_out(date_in):
             continue
         else:
             return date_out
+
+
+def search_by(search_type):
+    result = input(f'Enter the {search_type} you want to search: ')
+    return result
+
+
+def search_get_customer(customers):
+    customer_ids = []
+    for customer in customers:
+        customer_ids.append(str(customer[0]))
+        print(Customer(customer[0]))
+    while True:
+        choice = input('Choose a customer Id from the search result: ')
+        if choice not in customer_ids:
+            print('The customer id is not in the searching result list,try again')
+            continue
+        else:
+            return int(choice)

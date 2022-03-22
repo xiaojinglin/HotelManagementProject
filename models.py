@@ -40,7 +40,7 @@ class Customer:
         self.phone = self.customer[3]
 
     def __repr__(self):
-        return f'First Name: {self.first_name}, Last Name: {self.last_name}, Phone: {self.phone}'
+        return f'ID: {self.id}, First Name: {self.first_name}, Last Name: {self.last_name}, Phone: {self.phone}'
 
     @staticmethod
     def add(customer_info):
@@ -74,6 +74,16 @@ class Customer:
     @staticmethod
     def get_all_customers():
         cur.execute('SELECT * FROM customers')
+        return cur.fetchall()
+
+    @staticmethod
+    def search_customers(search_type,value):
+        sql = 'SELECT * FROM customers WHERE '
+        dict_customers = {'id':f'id={value}',
+                          'name':f"first_name like '%{value}%' OR last_name like '%{value}%'",
+                          'phone':f"phone like '%{value}%'"}
+        sql = sql + dict_customers.get(search_type)
+        cur.execute(sql)
         return cur.fetchall()
 
 
