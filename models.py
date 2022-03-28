@@ -6,6 +6,9 @@ myhost = "localhost"
 myuser = "python"
 mypass = "pythonmysql"
 
+db = mysql.connect(host=myhost,user=myuser,password=mypass)
+cur = db.cursor()
+cur.execute('CREATE DATABASE IF NOT EXISTS mydatabase')
 db = mysql.connect(host=myhost,user=myuser,password=mypass,database="mydatabase")   
 cur = db.cursor(buffered = True)
 cur.execute("DROP TABLE IF EXISTS customers")
