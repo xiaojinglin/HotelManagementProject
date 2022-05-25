@@ -157,15 +157,11 @@ def initialize():
         Room.add(f'10{i}','single',89)
         Room.add(f'20{i}','double',120)
     Customer.add(('John','Knight','5022222222'))
-    sql = 'SELECT * FROM customers WHERE first_name=%s and last_name=%s and phone=%s'
-    val = ('John','Knight','5022222222')
-    cur.execute(sql,val)
-    new_customer_id = cur.fetchone()[0]
+    new_customer = Customer.exist_customer(('John','Knight','5022222222'))
+    new_customer_id = new_customer[0]
     Room(1).update(new_customer_id,'2023-03-02','2023-03-10')
     Room(2).update(new_customer_id,'2023-03-02','2023-03-10')
     Customer.add(('Jake','White','5022222244'))
-    sql = 'SELECT * FROM customers WHERE first_name=%s and last_name=%s and phone=%s'
-    val = ('Jake','White','5022222244')
-    cur.execute(sql,val)
-    new_customer_id = cur.fetchone()[0]
+    new_customer = Customer.exist_customer(('Jake','White','5022222244'))
+    new_customer_id = new_customer[0]
     Room(9).update(new_customer_id,'2023-05-02','2023-05-10')
